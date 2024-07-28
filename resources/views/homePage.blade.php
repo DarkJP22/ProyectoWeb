@@ -1,9 +1,9 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex flex-col items-center">
-            <h2 class="font-semibold text-xl text-white leading-tight mb-4">
-                {{ __('Movies') }}
-            </h2>
+            <a href="{{ route('HomePage') }}" class="font-semibold text-xl text-white leading-tight mb-4">
+                <h2>{{ __('Movies') }}</h2>
+            </a>            
             <div class="flex space-x-4">
                 @foreach ($categories as $category)
                     <a href="{{ route('HomePage', ['category' => $category->name]) }}"
