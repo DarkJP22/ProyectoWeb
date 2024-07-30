@@ -11,6 +11,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
+use App\Models\Category;
+use App\Models\Author;
+use App\Models\Movie;
 
 class RegisteredUserController extends Controller
 {
@@ -19,7 +22,9 @@ class RegisteredUserController extends Controller
      */
     public function create(): View
     {
-        return view('auth.register');
+        $categories = Category::all();
+
+        return view('auth.register', compact('categories'));
     }
 
     /**
@@ -42,9 +47,21 @@ class RegisteredUserController extends Controller
         ]);
 
         event(new Registered($user));
-
+        
         Auth::login($user);
-
-        return view('homePage');
+        $categories = Category::all();
+        $authors = Author::all();
+        $selectedCategory = $request->query('category');
+        $movies = Movie::when($selectedCategory, function ($query, $category) {
+            return $query->whereHas('category', function ($q) use ($category) {
+                $q->where('name', $category);
+            });
+        })->get();
+        return view('homepage', [
+            'categories' => $categories,
+            'movies' => $movies,
+            'selectedCategory' => $selectedCategory,
+            'authors' => $authors,
+        ]);
     }
 }

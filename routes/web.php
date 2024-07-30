@@ -6,6 +6,7 @@ use App\Http\Controllers\MovieController;
 use App\Models\Movie;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\AuthorController;
+use App\Http\Middleware\CheckAdmin;
 
 // Ruta para la página de inicio
 Route::get('/', [MovieController::class, 'index'])->name('HomePage');
@@ -21,12 +22,14 @@ Route::middleware('auth')->group(function () {
 });
 
 // Rutas para en el panel de administración
-Route::middleware('auth')->group(function () {
+Route::middleware([CheckAdmin::class])->group(function () {
     // Rutas para Movies 
-    Route::post('/movies', [MovieController::class, 'store'])->name('movies.store')->can('create', Movie::class);
-    Route::get('/movies/{movie}/edit', [MovieController::class, 'edit'])->name('movies.edit')->can('update', 'movie');
-    Route::put('/movies/{movie}', [MovieController::class, 'update'])->name('movies.update')->can('update', 'movie');
-    Route::delete('/movies/{movie}', [MovieController::class, 'destroy'])->name('movies.destroy')->can('delete', 'movie');
+    Route::get('/movies', [MovieController::class, 'index'])->name('movies.index');
+    Route::get('/movies/create', [MovieController::class, 'create'])->name('movies.create');
+    Route::post('/movies', [MovieController::class, 'store'])->name('movies.store');
+    Route::get('/movies/{movie}/edit', [MovieController::class, 'edit'])->name('movies.edit');
+    Route::put('/movies/{movie}', [MovieController::class, 'update'])->name('movies.update');
+    Route::delete('/movies/{movie}', [MovieController::class, 'destroy'])->name('movies.destroy');
 
     // Rutas para Categories
     Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
@@ -43,5 +46,6 @@ Route::middleware('auth')->group(function () {
     // Ruta para el Dashboard
     Route::get('/dashboard', [MovieController::class, 'showDashboard'])->name('dashboard');
 });
+
 
 require __DIR__ . '/auth.php';
