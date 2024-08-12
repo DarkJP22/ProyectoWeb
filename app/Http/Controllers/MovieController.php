@@ -106,8 +106,8 @@ class MovieController extends Controller
                 'description' => 'required|string',
                 'release_date' => 'required|date',
                 'categories_id' => 'required|exists:categories,id',
-                'duration' => 'required|string|max:10',
-                'image_path' => 'required|image:jpeg,png,jpg,gif,svg',
+                'duration' => 'required|string',
+                'image_path' => 'image:jpeg,png,jpg,gif,svg',
             ]);
 
             // Actualizar película

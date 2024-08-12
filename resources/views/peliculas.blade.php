@@ -27,7 +27,7 @@
                             {{ $movie->release_date }}
                         </p>
                         <p class="card-text">Duración:
-                            {{ $movie->duration }}
+                            {{ $movie->duration }} horas
                         </p>
                         <a href="/movies/edit/{{ $movie->id }}" class="btn btn-primary">Editar</a>
 
