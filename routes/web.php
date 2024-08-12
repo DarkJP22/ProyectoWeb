@@ -9,7 +9,7 @@ use App\Http\Controllers\AuthorController;
 use App\Http\Middleware\CheckAdmin;
 
 // Ruta para la página de inicio
-Route::get('/', [MovieController::class, 'index'])->name('HomePage');
+Route::get('/', [MovieController::class, 'home'])->name('HomePage');
 
 // Ruta para filtrar películas por categoría en la página de inicio
 Route::get('/movies/category/{category}', [MovieController::class, 'index'])->name('movies.byCategory');
@@ -24,18 +24,21 @@ Route::middleware('auth')->group(function () {
 // Rutas para en el panel de administración
 Route::middleware([CheckAdmin::class])->group(function () {
     // Rutas para Movies 
-    Route::get('/movies', [MovieController::class, 'index'])->name('movies.index');
-    Route::get('/movies/create', [MovieController::class, 'create'])->name('movies.create');
-    Route::post('/movies', [MovieController::class, 'store'])->name('movies.store');
-    Route::get('/movies/{movie}/edit', [MovieController::class, 'edit'])->name('movies.edit');
-    Route::put('/movies/{movie}', [MovieController::class, 'update'])->name('movies.update');
-    Route::delete('/movies/{movie}', [MovieController::class, 'destroy'])->name('movies.destroy');
+    Route::get('/movies', [MovieController::class, 'index'])->name('movies');
+    //Route::get('/movies/create', [MovieController::class, 'create'])->name('movies.create');
+    Route::get('/movies/create', [MovieController::class, 'showCreate'])->name('movies.show');
+    Route::post('/movies/store', [MovieController::class, 'store']);
+    Route::get('/movies/{movie}/edit', [MovieController::class, 'edit']);
+    Route::put('/movies/{movie}/update', [MovieController::class, 'update']);
+    Route::delete('/movies/{movie}', [MovieController::class, 'destroy']);
 
     // Rutas para Categories
-    Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
-    Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
-    Route::post('/categories/{id}', [CategoryController::class, 'update'])->name('categories.update');
-    Route::delete('/categories/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
+    Route::get('/categories/create', [CategoryController::class, 'create'])->name('categories.create');
+    Route::get('/categories', [CategoryController::class, 'index'])->name('categories');
+    Route::post('/categories/store', [CategoryController::class, 'store'])->name('categories.store');
+    Route::get('/categories/{category}/edit', [CategoryController::class, 'edit']);
+    Route::put('/categories/{id}', [CategoryController::class, 'update']);
+    Route::delete('/categories/{category}/destroy', [CategoryController::class, 'destroy'])->name('categories.destroy');
 
     // Rutas para Authors
     Route::get('/authors', [AuthorController::class, 'index'])->name('authors.index');

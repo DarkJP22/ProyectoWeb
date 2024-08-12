@@ -10,23 +10,17 @@ use App\Models\Author;
 
 class MovieController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        $categories = Category::all();
-        $authors = Author::all();
-        $selectedCategory = $request->query('category');
-        
-        $movies = Movie::when($selectedCategory, function ($query, $category) {
-            return $query->whereHas('category', function ($q) use ($category) {
-                $q->where('name', $category);
-            });
-        })->get();
-    
-        return view('homepage', [
-            'categories' => $categories,
-            'movies' => $movies,
-            'selectedCategory' => $selectedCategory,
-            'authors' => $authors,
+        return view('peliculas', [
+            'movies' => Movie::all(),
+        ]);
+    }
+
+    public function home()
+    {
+        return view('homePage', [
+            'movies' => Movie::all(),
         ]);
     }
 
@@ -35,7 +29,7 @@ class MovieController extends Controller
         $categories = Category::all();
         $authors = Author::all();
         $selectedCategory = $request->input('category');
-        
+
         $movies = Movie::when($selectedCategory, function ($query, $category) {
             return $query->whereHas('category', function ($q) use ($category) {
                 $q->where('name', $category);
@@ -50,18 +44,26 @@ class MovieController extends Controller
         ]);
     }
 
+    public function showCreate()
+    {
+        $categories = Category::all();
+        return view('crearPelicula', [
+            'categories' => $categories,
+        ]);
+    }
+
     public function create(Request $request)
     {
         $categories = Category::all();
         $authors = Author::all();
         $selectedCategory = $request->query('category');
-        
+
         $movies = Movie::when($selectedCategory, function ($query, $category) {
             return $query->whereHas('category', function ($q) use ($category) {
                 $q->where('name', $category);
             });
         })->get();
-    
+
         return view('dashboard', [
             'categories' => $categories,
             'movies' => $movies,
@@ -72,56 +74,50 @@ class MovieController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        $validateData = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string|max:255',
             'categories_id' => 'required|exists:categories,id',
-            'author_id' => 'required|exists:authors,id',
             'release_date' => 'required|date',
             'duration' => 'required|string|max:10',
         ]);
 
-        $movieData = $request->only(['title', 'description', 'release_date', 'duration', 'categories_id', 'author_id']);
-
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('movies', 'public');
-            $movieData['image_path'] = $imagePath; // Guarda la ruta relativa
+        if ($request->hasFile('image_path')) {
+            $image = $request->file('image_path')->path();
+            $imageData = base64_encode(file_get_contents($image));
+            $validateData['image_path'] = $imageData;
         }
 
-        Movie::create($movieData);
+        Movie::create($validateData);
 
-        return redirect()->route('dashboard');
+        return view('peliculas');
     }
 
     public function update(Request $request, $id)
     {
         // Validar entrada
-        $request->validate([
+        $validateData = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'release_date' => 'required|date',
             'categories_id' => 'required|exists:categories,id',
-            'author_id' => 'required|exists:authors,id',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'duration' => 'required|string|max:10',
         ]);
 
         // Actualizar película
-        $movie = Movie::findOrFail($id);
-        $movie->title = $request->input('title');
-        $movie->description = $request->input('description');
-        $movie->release_date = $request->input('release_date');
-        $movie->categories_id = $request->input('categories_id');
-        $movie->duration = $request->input('duration');
-        $movie->author_id = $request->input('author_id');
-
-        if ($request->hasFile('image')) {
-            if ($movie->image_path) {
-                Storage::delete('public/' . $movie->image_path);
-            }
-            $imagePath = $request->file('image')->store('movies', 'public');
-            $movie->image_path = $imagePath; // Actualiza la ruta de la imagen
+        if ($request->hasFile('image_path')) {
+            $image = $request->file('image_path')->path();
+            $imageData = base64_encode(file_get_contents($image));
+            $validateData['image_path'] = $imageData;
         }
+
+        $movie = Movie::find($id);
+        $movie->title = $validateData['title'];
+        $movie->description = $validateData['description'];
+        $movie->release_date = $validateData['release_date'];
+        $movie->categories_id = $validateData['categories_id'];
+        $movie->duration = $validateData['duration'];
+        $movie->image_path = $validateData['image_path'];
 
         $movie->save();
 
@@ -130,10 +126,16 @@ class MovieController extends Controller
 
     public function destroy(Movie $movie)
     {
-        if ($movie->image_path) {
-            Storage::delete('public/' . $movie->image_path);
-        }
         $movie->delete();
-        return redirect()->route('dashboard');
+        return redirect()->route('movies');
+    }
+
+    public function edit(Movie $movie)
+    {
+        $categories = Category::all();
+        return view('editarPelicula', [
+            'movie' => $movie,
+            'categories' => $categories,
+        ]);
     }
 }

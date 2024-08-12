@@ -2,6 +2,13 @@
     <br>
     <br>
     <div class="container">
+        <a href="{{ route('movies.show') }}">
+            <button type="button" class="btn btn-primary">
+                Agregar Pelicula
+            </button>
+        </a>
+        <br>
+        <br>
         <div class="d-flex justify-content-evenly">
             @foreach ($movies as $movie)
                 <div class="card" style="width: 18rem;">
@@ -22,9 +29,17 @@
                         <p class="card-text">Duración:
                             {{ $movie->duration }}
                         </p>
+                        <a href="/movies/{{ $movie->id }}/edit" class="btn btn-primary">Editar</a>
+
+                        <form action="/movies/{{ $movie->id }}" method="POST" class="d-inline">
+                            @csrf
+                            @method('delete')
+                            <button type="submit" class="btn btn-danger">Eliminar</button>
+                        </form>
                     </div>
                 </div>
             @endforeach
+
         </div>
     </div>
 </x-app-layout>

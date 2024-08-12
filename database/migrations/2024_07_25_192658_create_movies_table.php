@@ -17,8 +17,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->date('release_date');
             $table->integer('duration');
-            $table->string('image_path');
-            $table->foreignId('author_id')->constrained()->onDelete('cascade');;
+            $table->blob('image_path');
             $table->foreignId('categories_id')->constrained()->onDelete('cascade');;
             $table->timestamps();
         });

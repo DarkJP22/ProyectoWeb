@@ -17,9 +17,4 @@ class Movie extends Model
     {
         return $this->belongsTo(Category::class, 'categories_id');
     }
-
-    public function author()
-    {
-        return $this->belongsTo(Author::class, 'author_id');
-    }
 }
