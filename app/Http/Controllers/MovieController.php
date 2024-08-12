@@ -74,54 +74,65 @@ class MovieController extends Controller
 
     public function store(Request $request)
     {
-        $validateData = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string|max:255',
-            'categories_id' => 'required|exists:categories,id',
-            'release_date' => 'required|date',
-            'duration' => 'required|string|max:10',
-        ]);
+        try {
+            $validateData = $request->validate([
+                'title' => 'required|string|max:255',
+                'description' => 'required|string|max:255',
+                'categories_id' => 'required|exists:categories,id',
+                'release_date' => 'required|date',
+                'duration' => 'required|string|max:10',
+                'image_path' => 'required|image:jpeg,png,jpg,gif,svg',
+            ]);
 
-        if ($request->hasFile('image_path')) {
-            $image = $request->file('image_path')->path();
-            $imageData = base64_encode(file_get_contents($image));
-            $validateData['image_path'] = $imageData;
+            if ($request->hasFile('image_path')) {
+                $image = $request->file('image_path')->path();
+                $imageData = base64_encode(file_get_contents($image));
+                $validateData['image_path'] = $imageData;
+            }
+
+            Movie::create($validateData);
+
+            return response()->json(['message' => 'Película creada con éxito']);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
         }
-
-        Movie::create($validateData);
-
-        return view('peliculas');
     }
 
     public function update(Request $request, $id)
     {
-        // Validar entrada
-        $validateData = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'release_date' => 'required|date',
-            'categories_id' => 'required|exists:categories,id',
-            'duration' => 'required|string|max:10',
-        ]);
+        try {
+            $validateData = $request->validate([
+                'title' => 'required|string|max:255',
+                'description' => 'required|string',
+                'release_date' => 'required|date',
+                'categories_id' => 'required|exists:categories,id',
+                'duration' => 'required|string|max:10',
+                'image_path' => 'required|image:jpeg,png,jpg,gif,svg',
+            ]);
 
-        // Actualizar película
-        if ($request->hasFile('image_path')) {
-            $image = $request->file('image_path')->path();
-            $imageData = base64_encode(file_get_contents($image));
-            $validateData['image_path'] = $imageData;
+            // Actualizar película
+            if ($request->hasFile('image_path')) {
+                $image = $request->file('image_path')->path();
+                $imageData = base64_encode(file_get_contents($image));
+                $validateData['image_path'] = $imageData;
+            }
+
+            $movie = Movie::find($id);
+            $movie->title = $validateData['title'];
+            $movie->description = $validateData['description'];
+            $movie->release_date = $validateData['release_date'];
+            $movie->categories_id = $validateData['categories_id'];
+            $movie->duration = $validateData['duration'];
+            $movie->image_path = $validateData['image_path'];
+
+            $movie->save();
+
+            return response()->json(['message' => 'Película actualizada con éxito']);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
         }
+        // Validar entrada
 
-        $movie = Movie::find($id);
-        $movie->title = $validateData['title'];
-        $movie->description = $validateData['description'];
-        $movie->release_date = $validateData['release_date'];
-        $movie->categories_id = $validateData['categories_id'];
-        $movie->duration = $validateData['duration'];
-        $movie->image_path = $validateData['image_path'];
-
-        $movie->save();
-
-        return response()->json(['message' => 'Película actualizada con éxito']);
     }
 
     public function destroy(Movie $movie)

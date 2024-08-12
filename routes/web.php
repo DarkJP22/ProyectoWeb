@@ -28,7 +28,7 @@ Route::middleware([CheckAdmin::class])->group(function () {
     //Route::get('/movies/create', [MovieController::class, 'create'])->name('movies.create');
     Route::get('/movies/create', [MovieController::class, 'showCreate'])->name('movies.show');
     Route::post('/movies/store', [MovieController::class, 'store']);
-    Route::get('/movies/{movie}/edit', [MovieController::class, 'edit']);
+    Route::get('/movies/edit/{movie}', [MovieController::class, 'edit']);
     Route::put('/movies/{movie}/update', [MovieController::class, 'update']);
     Route::delete('/movies/{movie}', [MovieController::class, 'destroy']);
 
@@ -40,11 +40,6 @@ Route::middleware([CheckAdmin::class])->group(function () {
     Route::put('/categories/{id}', [CategoryController::class, 'update']);
     Route::delete('/categories/{category}/destroy', [CategoryController::class, 'destroy'])->name('categories.destroy');
 
-    // Rutas para Authors
-    Route::get('/authors', [AuthorController::class, 'index'])->name('authors.index');
-    Route::post('/authors', [AuthorController::class, 'store'])->name('authors.store');
-    Route::put('/authors/{author}', [AuthorController::class, 'update'])->name('authors.update');
-    Route::delete('/authors/{author}', [AuthorController::class, 'destroy'])->name('authors.destroy');
 
     // Ruta para el Dashboard
     Route::get('/dashboard', [MovieController::class, 'showDashboard'])->name('dashboard');

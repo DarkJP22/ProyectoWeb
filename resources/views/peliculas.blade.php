@@ -29,7 +29,7 @@
                         <p class="card-text">Duración:
                             {{ $movie->duration }}
                         </p>
-                        <a href="/movies/{{ $movie->id }}/edit" class="btn btn-primary">Editar</a>
+                        <a href="/movies/edit/{{ $movie->id }}" class="btn btn-primary">Editar</a>
 
                         <form action="/movies/{{ $movie->id }}" method="POST" class="d-inline">
                             @csrf

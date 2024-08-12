@@ -43,27 +43,60 @@
     </div>
 
     <script>
+        /*document.getElementById("form").onsubmit = async function(event) {
+                    event.preventDefault();
+                    const formulario = document.getElementById('form');
+                    const formData = new FormData(formulario);
+                    const id = document.getElementById('hide').value;
+
+                    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+                    fetch(`/movies/${id}/update`, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': csrfToken
+                            },
+                            body: formData
+                        })
+                        .then(data => {
+                            console.log('Éxito:', data);
+                        });
+                    .then(() => {
+                        window.location.href = '/movies';
+                    })
+                }*/
+
         document.getElementById("form").onsubmit = async function(event) {
             event.preventDefault();
+
             const formulario = document.getElementById('form');
             const formData = new FormData(formulario);
             const id = document.getElementById('hide').value;
 
             const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-            fetch(`/movies/${id}/update`, {
+            try {
+                const response = await fetch(`/movies/${id}/update`, {
                     method: 'POST',
                     headers: {
-                        'X-CSRF-TOKEN': csrfToken
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json' // Opcional, dependiendo de si el backend espera JSON
                     },
                     body: formData
-                })
-                .then(data => {
-                    console.log('Éxito:', data);
                 });
-            .then(() => {
-                window.location.href = '/movies';
-            })
+
+                if (!response.ok) {
+                    throw new Error(`Error en la solicitud: ${response.statusText}`);
+                }
+
+                const result = await response.json();
+                console.log('Éxito:', result);
+
+                window.location.href = '/movies'; // Redirige al usuario a la lista de películas
+
+            } catch (error) {
+                console.error(error.message);
+            }
         }
     </script>
 </x-app-layout>
