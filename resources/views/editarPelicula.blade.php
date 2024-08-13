@@ -19,7 +19,7 @@
             <div class="mb-3">
                 <label for="duration" class="form-label">Duración</label>
                 <input type="text" class="form-control" id="duration" name="duration" value="{{ $movie->duration }}"
-                    required pattern="[0-9]{2}">
+                    required pattern="[0-9]{1}">
             </div>
             <div class="mb-3">
                 <label for="categories_id" class="form-label">Categoria</label>
