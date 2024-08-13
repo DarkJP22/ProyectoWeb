@@ -3,9 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\MovieController;
-use App\Models\Movie;
 use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\AuthorController;
 use App\Http\Middleware\CheckAdmin;
 
 // Ruta para la página de inicio
@@ -25,7 +23,6 @@ Route::middleware('auth')->group(function () {
 Route::middleware([CheckAdmin::class])->group(function () {
     // Rutas para Movies 
     Route::get('/movies', [MovieController::class, 'index'])->name('movies');
-    //Route::get('/movies/create', [MovieController::class, 'create'])->name('movies.create');
     Route::get('/movies/create', [MovieController::class, 'showCreate'])->name('movies.show');
     Route::post('/movies/store', [MovieController::class, 'store']);
     Route::get('/movies/edit/{movie}', [MovieController::class, 'edit']);

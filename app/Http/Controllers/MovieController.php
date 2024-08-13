@@ -14,20 +14,43 @@ class MovieController extends Controller
     {
         return view('peliculas', [
             'movies' => Movie::all(),
+            'categories' => Category::all(),
         ]);
     }
 
-    public function home()
+    public function home(request $request)
     {
+        $categories = Category::all();
+        $selectedCategory = $request->input('category');
+
+        $movies = Movie::when($selectedCategory, function ($query, $category) {
+            return $query->whereHas('category', function ($q) use ($category) {
+                $q->where('name', $category);
+            });
+        })->get();
         return view('homePage', [
-            'movies' => Movie::all(),
+            'categories' => Category::all(),
+            'selectedCategory' => $selectedCategory,
+            'movies' => $movies,
+        ]);
+    }
+
+    public function show($id)
+    {
+        $movie = Movie::with('category')->findOrFail($id);
+        return response()->json([
+            'title' => $movie->title,
+            'image_path' => $movie->image_path,
+            'description' => $movie->description,
+            'category_name' => $movie->category->name,
+            'release_date' => $movie->release_date,
+            'duration' => $movie->duration,
         ]);
     }
 
     public function showDashboard(Request $request)
     {
         $categories = Category::all();
-        $authors = Author::all();
         $selectedCategory = $request->input('category');
 
         $movies = Movie::when($selectedCategory, function ($query, $category) {
@@ -40,7 +63,6 @@ class MovieController extends Controller
             'categories' => $categories,
             'selectedCategory' => $selectedCategory,
             'movies' => $movies,
-            'authors' => $authors,
         ]);
     }
 
